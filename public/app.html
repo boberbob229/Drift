@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>drift — study together</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+          --bg: #faf9f7;
+          --bg-elevated: #ffffff;
+          --bg-subtle: #f3f1ed;
+          --text: #1d1c1a;
+          --text-soft: #6b6760;
+          --text-muted: #a09a90;
+          --border: #e8e5de;
+          --accent: #c4a574;
+          --accent-soft: #f5efe6;
+          --success: #7a9b76;
+          --warm: #e8c4a0;
+        }
+
+        [data-theme="dark"] {
+          --bg: #141312;
+          --bg-elevated: #1c1b19;
+          --bg-subtle: #232220;
+          --text: #e8e5de;
+          --text-soft: #9a958c;
+          --text-muted: #5c5851;
+          --border: #2e2c28;
+          --accent: #d4b896;
+          --accent-soft: #2a2520;
+          --success: #8fb08a;
+          --warm: #3d3530;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+          font-family: 'DM Sans', system-ui, sans-serif;
+          background: var(--bg);
+          color: var(--text);
+          min-height: 100vh;
+          transition: background 0.5s ease, color 0.3s ease;
+          -webkit-font-smoothing: antialiased;
+          position: relative;
+        }
+
+        .bg-media {
+          position: fixed;
+          inset: 0;
+          z-index: -1;
+          overflow: hidden;
+        }
+
+        .bg-media img,
+        .bg-media video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          filter: blur(var(--bg-blur, 8px));
+          transform: scale(1.05);
+          transition: filter 0.3s ease;
+        }
+
+        .bg-media::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: var(--bg);
+          opacity: var(--bg-overlay, 0.7);
+          transition: opacity 0.3s ease;
+        }
+
+        .container {
+          max-width: 720px;
+          margin: 0 auto;
+          padding: 48px 24px;
+          position: relative;
+          z-index: 1;
+        }
+
+        header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 64px;
+        }
+
+        .brand {
+          font-family: 'Fraunces', serif;
+          font-size: 22px;
+          font-weight: 400;
+          letter-spacing: -0.02em;
+          color: var(--text);
+        }
+
+        .header-right {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .streak {
+          font-size: 13px;
+          color: var(--text-soft);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .streak-num {
+          font-weight: 500;
+          color: var(--accent);
+        }
+
+        .theme-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 1px solid var(--border);
+          background: transparent;
+          cursor: pointer;
+          display: grid;
+          place-items: center;
+          transition: all 0.2s ease;
+          color: var(--text-soft);
+        }
+
+        .theme-btn:hover {
+          border-color: var(--text-muted);
+          color: var(--text);
+        }
+
+        .user-menu {
+          position: relative;
+        }
+
+        .user-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 1px solid var(--border);
+          background: var(--bg-subtle);
+          cursor: pointer;
+          display: grid;
+          place-items: center;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-soft);
+          overflow: hidden;
+        }
+
+        .user-btn img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .user-dropdown {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 6px;
+          min-width: 180px;
+          opacity: 0;
+          visibility: hidden;
+          transform: scale(0.95);
+          transition: all 0.2s ease;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+          z-index: 100;
+        }
+
+        .user-dropdown.open {
+          opacity: 1;
+          visibility: visible;
+          transform: scale(1);
+        }
+
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          padding: 10px 12px;
+          border: none;
+          background: none;
+          font-family: inherit;
+          font-size: 13px;
+          color: var(--text);
+          text-align: left;
+          cursor: pointer;
+          border-radius: 8px;
+          transition: background 0.15s ease;
+        }
+
+        .dropdown-item svg {
+          color: var(--text-soft);
+        }
+
+        .dropdown-item:hover {
+          background: var(--bg-subtle);
+        }
+
+        .dropdown-item:hover svg {
+          color: var(--text);
+        }
+
+        nav {
+          display: flex;
+          gap: 32px;
+          margin-bottom: 56px;
+          border-bottom: 1px solid var(--border);
+          padding-bottom: 16px;
+        }
+
+        .nav-link {
+          font-size: 14px;
+          color: var(--text-muted);
+          cursor: pointer;
+          padding-bottom: 16px;
+          margin-bottom: -17px;
+          border-bottom: 1.5px solid transparent;
+          transition: all 0.2s ease;
+          background: none;
+          border-top: none;
+          border-left: none;
+          border-right: none;
+          font-family: inherit;
+        }
+
+        .nav-link:hover { color: var(--text-soft); }
+
+        .nav-link.active {
+          color: var(--text);
+          border-bottom-color: var(--text);
+        }
+
+        section { display: none; animation: fadeUp 0.4s ease; }
+        section.active { display: block; }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timer-wrap {
+          text-align: center;
+          padding: 40px 0 60px;
+        }
+
+        .label-picker {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          background: var(--bg-subtle);
+          border-radius: 100px;
+          font-size: 13px;
+          color: var(--text-soft);
+          cursor: pointer;
+          margin-bottom: 48px;
+          border: none;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          position: relative;
+        }
+
+        .label-picker:hover { background: var(--border); }
+
+        .label-picker.has-label {
+          background: var(--accent-soft);
+          color: var(--accent);
+        }
+
+        .label-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: currentColor;
+        }
+
+        .label-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%) scale(0.95);
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 6px;
+          min-width: 160px;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.2s ease;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+          z-index: 50;
+        }
+
+        .label-menu.open {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(-50%) scale(1);
+        }
+
+        .label-opt {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 12px;
+          border-radius: 8px;
+          font-size: 13px;
+          color: var(--text);
+          cursor: pointer;
+          transition: background 0.15s ease;
+        }
+
+        .label-opt:hover { background: var(--bg-subtle); }
+
+        .time-display {
+          font-family: 'Fraunces', serif;
+          font-size: clamp(64px, 18vw, 120px);
+          font-weight: 300;
+          letter-spacing: -0.03em;
+          color: var(--text);
+          line-height: 1;
+          margin-bottom: 48px;
+          transition: color 0.3s ease;
+          font-variant-numeric: tabular-nums;
+        }
+
+        .time-display.running { color: var(--accent); }
+
+        .timer-actions {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+        }
+
+        .btn {
+          font-family: inherit;
+          font-size: 14px;
+          font-weight: 400;
+          padding: 14px 36px;
+          border-radius: 100px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: none;
+        }
+
+        .btn-primary {
+          background: var(--text);
+          color: var(--bg);
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+          background: var(--bg-subtle);
+          color: var(--text);
+          border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover { background: var(--border); }
+
+        .btn:active { transform: scale(0.98); }
+
+        .today-summary {
+          margin-top: 56px;
+          padding-top: 32px;
+          border-top: 1px solid var(--border);
+          display: flex;
+          justify-content: center;
+          gap: 48px;
+        }
+
+        .stat {
+          text-align: center;
+        }
+
+        .stat-val {
+          font-family: 'Fraunces', serif;
+          font-size: 28px;
+          font-weight: 400;
+          color: var(--text);
+          margin-bottom: 4px;
+        }
+
+        .stat-label {
+          font-size: 12px;
+          color: var(--text-muted);
+          text-transform: lowercase;
+          letter-spacing: 0.02em;
+        }
+
+        .cal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 32px;
+        }
+
+        .cal-title {
+          font-family: 'Fraunces', serif;
+          font-size: 20px;
+          font-weight: 400;
+        }
+
+        .cal-nav {
+          display: flex;
+          gap: 4px;
+        }
+
+        .cal-nav button {
+          width: 32px;
+          height: 32px;
+          border: 1px solid var(--border);
+          background: transparent;
+          border-radius: 8px;
+          cursor: pointer;
+          color: var(--text-soft);
+          display: grid;
+          place-items: center;
+          transition: all 0.15s ease;
+        }
+
+        .cal-nav button:hover {
+          background: var(--bg-subtle);
+          color: var(--text);
+        }
+
+        .cal-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 6px;
+        }
+
+        .cal-weekday {
+          font-size: 11px;
+          color: var(--text-muted);
+          text-align: center;
+          padding: 8px 0;
+          text-transform: lowercase;
+        }
+
+        .cal-day {
+          aspect-ratio: 1;
+          border-radius: 10px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          color: var(--text-soft);
+          cursor: pointer;
+          transition: all 0.15s ease;
+          background: var(--bg-subtle);
+          border: 1px solid transparent;
+        }
+
+        .cal-day:hover:not(.empty) {
+          border-color: var(--border);
+          transform: scale(1.02);
+        }
+
+        .cal-day.empty {
+          background: transparent;
+          cursor: default;
+        }
+
+        .cal-day.today {
+          border: 1.5px solid var(--accent);
+        }
+
+        .cal-day .num { font-weight: 500; color: var(--text); }
+        .cal-day .mins { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+        .cal-day.l1 { background: color-mix(in srgb, var(--accent) 10%, var(--bg-subtle)); }
+        .cal-day.l2 { background: color-mix(in srgb, var(--accent) 20%, var(--bg-subtle)); }
+        .cal-day.l3 { background: color-mix(in srgb, var(--accent) 35%, var(--bg-subtle)); }
+        .cal-day.l4 { background: color-mix(in srgb, var(--accent) 50%, var(--bg-subtle)); }
+        .cal-day.l5 { background: var(--accent); color: var(--bg); }
+        .cal-day.l5 .num { color: var(--bg); }
+        .cal-day.l5 .mins { color: var(--bg); opacity: 0.8; }
+
+        .lb-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 32px;
+        }
+
+        .lb-title {
+          font-family: 'Fraunces', serif;
+          font-size: 20px;
+          font-weight: 400;
+        }
+
+        .period-toggle {
+          display: flex;
+          background: var(--bg-subtle);
+          border-radius: 8px;
+          padding: 3px;
+        }
+
+        .period-btn {
+          font-family: inherit;
+          font-size: 12px;
+          padding: 6px 12px;
+          border: none;
+          background: transparent;
+          color: var(--text-muted);
+          cursor: pointer;
+          border-radius: 6px;
+          transition: all 0.15s ease;
+        }
+
+        .period-btn:hover { color: var(--text-soft); }
+        .period-btn.active {
+          background: var(--bg-elevated);
+          color: var(--text);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .lb-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .lb-item {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 16px 20px;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          transition: all 0.2s ease;
+        }
+
+        .lb-item:hover {
+          transform: translateX(4px);
+          border-color: var(--text-muted);
+        }
+
+        .lb-item.you { border-color: var(--accent); background: var(--accent-soft); }
+
+        .lb-rank {
+          width: 24px;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-muted);
+        }
+
+        .lb-item:nth-child(1) .lb-rank { color: var(--accent); }
+        .lb-item:nth-child(2) .lb-rank { color: var(--text-soft); }
+        .lb-item:nth-child(3) .lb-rank { color: #c4937a; }
+
+        .lb-avatar {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          display: grid;
+          place-items: center;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-soft);
+          overflow: hidden;
+        }
+
+        .lb-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .lb-info { flex: 1; }
+        .lb-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .lb-streak { font-size: 12px; color: var(--text-muted); }
+
+        .lb-time {
+          font-family: 'Fraunces', serif;
+          font-size: 18px;
+          color: var(--text);
+        }
+
+        .fr-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 32px;
+        }
+
+        .fr-title {
+          font-family: 'Fraunces', serif;
+          font-size: 20px;
+          font-weight: 400;
+        }
+
+        .add-btn {
+          font-family: inherit;
+          font-size: 13px;
+          padding: 10px 20px;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: 100px;
+          cursor: pointer;
+          color: var(--text);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.15s ease;
+        }
+
+        .add-btn:hover { background: var(--border); }
+
+        .fr-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 12px;
+        }
+
+        .fr-card {
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          padding: 24px;
+          text-align: center;
+          transition: all 0.2s ease;
+        }
+
+        .fr-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .fr-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          display: grid;
+          place-items: center;
+          font-size: 18px;
+          font-weight: 500;
+          color: var(--text-soft);
+          margin: 0 auto 14px;
+          overflow: hidden;
+        }
+
+        .fr-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .fr-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+
+        .fr-status {
+          font-size: 12px;
+          color: var(--text-muted);
+          margin-bottom: 16px;
+        }
+
+        .fr-status.active { color: var(--success); }
+
+        .fr-stats {
+          display: flex;
+          justify-content: center;
+          gap: 24px;
+          padding-top: 14px;
+          border-top: 1px solid var(--border);
+        }
+
+        .fr-stat-val {
+          font-family: 'Fraunces', serif;
+          font-size: 16px;
+          color: var(--text);
+        }
+
+        .fr-stat-lbl {
+          font-size: 10px;
+          color: var(--text-muted);
+          text-transform: lowercase;
+        }
+
+        .modal-bg {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.4);
+          backdrop-filter: blur(4px);
+          display: grid;
+          place-items: center;
+          z-index: 100;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.25s ease;
+        }
+
+        .modal-bg.open { opacity: 1; visibility: visible; }
+
+        .modal {
+          background: var(--bg-elevated);
+          border-radius: 20px;
+          padding: 32px;
+          width: 90%;
+          max-width: 380px;
+          transform: scale(0.95) translateY(10px);
+          transition: transform 0.25s ease;
+          box-shadow: 0 24px 48px rgba(0,0,0,0.15);
+        }
+
+        .modal-bg.open .modal {
+          transform: scale(1) translateY(0);
+        }
+
+        .modal-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .modal-title {
+          font-family: 'Fraunces', serif;
+          font-size: 18px;
+          font-weight: 400;
+        }
+
+        .modal-close {
+          width: 28px;
+          height: 28px;
+          border: none;
+          background: var(--bg-subtle);
+          border-radius: 50%;
+          cursor: pointer;
+          color: var(--text-soft);
+          display: grid;
+          place-items: center;
+          transition: all 0.15s ease;
+        }
+
+        .modal-close:hover { background: var(--border); color: var(--text); }
+
+        .session-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .session-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 14px 16px;
+          background: var(--bg-subtle);
+          border-radius: 10px;
+        }
+
+        .session-label {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13px;
+        }
+
+        .session-time { font-weight: 500; font-size: 14px; }
+
+        .empty-msg {
+          text-align: center;
+          color: var(--text-muted);
+          padding: 32px;
+          font-size: 14px;
+        }
+
+        .invite-section { margin-top: 20px; }
+        .invite-label { font-size: 13px; color: var(--text-soft); margin-bottom: 10px; }
+
+        .invite-box {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 16px;
+          background: var(--bg-subtle);
+          border-radius: 10px;
+        }
+
+        .invite-code {
+          flex: 1;
+          font-family: 'DM Sans', monospace;
+          font-size: 15px;
+          letter-spacing: 0.1em;
+          color: var(--text);
+        }
+
+        .copy-btn {
+          font-family: inherit;
+          font-size: 12px;
+          padding: 8px 14px;
+          background: var(--text);
+          color: var(--bg);
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: opacity 0.15s ease;
+        }
+
+        .copy-btn:hover { opacity: 0.85; }
+
+        .share-section {
+          padding: 20px;
+          background: linear-gradient(135deg, var(--accent-soft) 0%, color-mix(in srgb, var(--accent-soft) 50%, var(--bg-subtle)) 100%);
+          border-radius: 14px;
+          border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+          text-align: center;
+        }
+
+        .share-label {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: var(--accent);
+          margin-bottom: 12px;
+          font-weight: 500;
+        }
+
+        .share-code {
+          font-family: 'Fraunces', serif;
+          font-size: 22px;
+          letter-spacing: 0.1em;
+          color: var(--text);
+          font-weight: 500;
+          margin-bottom: 14px;
+          display: block;
+        }
+
+        .share-copy-btn {
+          font-family: inherit;
+          font-size: 12px;
+          padding: 10px 20px;
+          background: var(--accent);
+          color: var(--bg);
+          border: none;
+          border-radius: 100px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 500;
+        }
+
+        .share-copy-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 40%, transparent);
+        }
+
+        .share-copy-btn:active {
+          transform: scale(0.98);
+        }
+
+        .divider {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin: 24px 0;
+          color: var(--text-muted);
+          font-size: 12px;
+          text-transform: lowercase;
+        }
+
+        .divider::before,
+        .divider::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: var(--border);
+        }
+
+        .friend-input-section {
+          background: var(--bg-subtle);
+          border-radius: 12px;
+          padding: 16px;
+        }
+
+        .friend-input-label {
+          font-size: 12px;
+          color: var(--text-soft);
+          margin-bottom: 10px;
+        }
+
+        .friend-input-row {
+          display: flex;
+          gap: 8px;
+        }
+
+        .friend-input-row input {
+          flex: 1;
+          padding: 12px 14px;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          font-family: inherit;
+          font-size: 14px;
+          color: var(--text);
+          transition: all 0.15s ease;
+          letter-spacing: 0.05em;
+        }
+
+        .friend-input-row input:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+        }
+
+        .friend-input-row input::placeholder {
+          color: var(--text-muted);
+          letter-spacing: 0.05em;
+        }
+
+        .friend-add-btn {
+          padding: 12px 20px;
+          background: var(--text);
+          color: var(--bg);
+          border: none;
+          border-radius: 10px;
+          font-family: inherit;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .friend-add-btn:hover {
+          opacity: 0.9;
+          transform: translateY(-1px);
+        }
+
+        .settings-section {
+          margin-bottom: 24px;
+        }
+
+        .settings-section:last-child {
+          margin-bottom: 0;
+        }
+
+        .settings-section-title {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: var(--text-muted);
+          margin-bottom: 12px;
+          font-weight: 500;
+        }
+
+        .settings-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 16px;
+          background: var(--bg-subtle);
+          border-radius: 10px;
+          margin-bottom: 8px;
+        }
+
+        .settings-row:last-child {
+          margin-bottom: 0;
+        }
+
+        .settings-row-label {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 14px;
+          color: var(--text);
+        }
+
+        .settings-row-label svg {
+          width: 18px;
+          height: 18px;
+          color: var(--text-soft);
+        }
+
+        .settings-row-action {
+          font-size: 12px;
+          color: var(--accent);
+          cursor: pointer;
+          transition: opacity 0.15s ease;
+        }
+
+        .settings-row-action:hover {
+          opacity: 0.8;
+        }
+
+        .bg-settings {
+          margin-top: 12px;
+          padding-top: 12px;
+          border-top: 1px solid var(--border);
+        }
+
+        .bg-settings-title {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--text-muted);
+          margin-bottom: 12px;
+        }
+
+        .bg-options {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .bg-option {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 12px;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          font-size: 13px;
+          color: var(--text);
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .bg-option:hover {
+          background: var(--border);
+        }
+
+        .bg-option.active {
+          border-color: var(--accent);
+          background: var(--accent-soft);
+        }
+
+        .bg-option input[type="file"] {
+          display: none;
+        }
+
+        .bg-option svg {
+          width: 16px;
+          height: 16px;
+          color: var(--text-soft);
+        }
+
+        .bg-slider-group {
+          margin-top: 12px;
+        }
+
+        .bg-slider-label {
+          display: flex;
+          justify-content: space-between;
+          font-size: 12px;
+          color: var(--text-soft);
+          margin-bottom: 6px;
+        }
+
+        .bg-slider {
+          width: 100%;
+          height: 4px;
+          border-radius: 2px;
+          background: var(--border);
+          -webkit-appearance: none;
+          appearance: none;
+          cursor: pointer;
+        }
+
+        .bg-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: var(--accent);
+          cursor: pointer;
+          transition: transform 0.15s ease;
+        }
+
+        .bg-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+        }
+
+        .bg-clear-btn {
+          margin-top: 12px;
+          width: 100%;
+          padding: 10px;
+          background: transparent;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          font-family: inherit;
+          font-size: 12px;
+          color: var(--text-muted);
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .bg-clear-btn:hover {
+          background: var(--bg-subtle);
+          color: var(--text);
+        }
+
+        .input-row {
+          display: flex;
+          gap: 8px;
+          margin-top: 12px;
+        }
+
+        .input-row input {
+          flex: 1;
+          padding: 12px 14px;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          font-family: inherit;
+          font-size: 14px;
+          color: var(--text);
+          transition: border-color 0.15s ease;
+        }
+
+        .input-row input:focus {
+          outline: none;
+          border-color: var(--accent);
+        }
+
+        .input-row input::placeholder { color: var(--text-muted); }
+
+        .toast {
+          position: fixed;
+          bottom: 32px;
+          left: 50%;
+          transform: translateX(-50%) translateY(80px);
+          background: var(--text);
+          color: var(--bg);
+          padding: 14px 24px;
+          border-radius: 100px;
+          font-size: 13px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+          transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+          z-index: 200;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        .file-input-wrap {
+          margin-top: 12px;
+        }
+
+        .file-input-wrap input[type="file"] {
+          width: 100%;
+          padding: 12px;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          font-family: inherit;
+          font-size: 13px;
+          color: var(--text);
+        }
+
+        .file-input-wrap input[type="file"]::file-selector-button {
+          padding: 6px 12px;
+          margin-right: 12px;
+          background: var(--text);
+          color: var(--bg);
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+          .container { padding: 32px 20px; }
+          header { margin-bottom: 40px; }
+          nav { gap: 24px; margin-bottom: 40px; }
+          .time-display { font-size: 56px; margin-bottom: 36px; }
+          .btn { padding: 12px 28px; font-size: 13px; }
+          .today-summary { gap: 32px; flex-wrap: wrap; }
+          .fr-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-media" id="bgMedia"></div>
+<div class="container">
+    <header>
+        <div class="brand">drift</div>
+        <div class="header-right">
+            <div class="streak">
+                <span>☀</span>
+                <span class="streak-num" id="streakNum">0</span>
+                <span>days</span>
+            </div>
+            <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2m0 16v2M4 12H2m20 0h-2m-2.93-7.07 1.41-1.41M5.52 18.48l1.41-1.41m11.55 0 1.41 1.41M5.52 5.52 6.93 6.93"/>
+                </svg>
+            </button>
+            <div class="user-menu">
+                <button class="user-btn" id="userBtn" onclick="toggleUserMenu()"></button>
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="dropdown-item" onclick="openSettings()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                        settings
+                    </button>
+                    <button class="dropdown-item" onclick="openMyInvites()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        my invites
+                    </button>
+                    <button class="dropdown-item" onclick="logout()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <button class="nav-link active" data-page="timer">timer</button>
+        <button class="nav-link" data-page="calendar">calendar</button>
+        <button class="nav-link" data-page="leaderboard">leaderboard</button>
+        <button class="nav-link" data-page="friends">friends</button>
+    </nav>
+
+    <section id="timer" class="active">
+        <div class="timer-wrap">
+            <button class="label-picker" id="labelPicker">
+                <span class="label-dot"></span>
+                <span id="labelText">focus</span>
+            </button>
+            <div class="label-menu" id="labelMenu">
+                <div class="label-opt" data-label="focus" data-color="var(--text-soft)">
+                    <span class="label-dot" style="background: var(--text-soft)"></span> focus
+                </div>
+                <div class="label-opt" data-label="math" data-color="#c4937a">
+                    <span class="label-dot" style="background: #c4937a"></span> math
+                </div>
+                <div class="label-opt" data-label="reading" data-color="#7a9b76">
+                    <span class="label-dot" style="background: #7a9b76"></span> reading
+                </div>
+                <div class="label-opt" data-label="coding" data-color="#7a8a9b">
+                    <span class="label-dot" style="background: #7a8a9b"></span> coding
+                </div>
+                <div class="label-opt" data-label="writing" data-color="#9b7a96">
+                    <span class="label-dot" style="background: #9b7a96"></span> writing
+                </div>
+            </div>
+
+            <div class="time-display" id="timeDisplay">00:00</div>
+
+            <div class="timer-actions">
+                <button class="btn btn-primary" id="startBtn">start</button>
+                <button class="btn btn-secondary" id="endBtn" style="display:none">end</button>
+            </div>
+
+            <div class="today-summary">
+                <div class="stat">
+                    <div class="stat-val" id="todayTime">0m</div>
+                    <div class="stat-label">today</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-val" id="weekTime">0h</div>
+                    <div class="stat-label">this week</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-val" id="sessionCount">0</div>
+                    <div class="stat-label">sessions</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="calendar">
+        <div class="cal-header">
+            <h2 class="cal-title" id="calTitle"></h2>
+            <div class="cal-nav">
+                <button onclick="changeMonth(-1)">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <button onclick="changeMonth(1)">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+    </section>
+
+    <section id="leaderboard">
+        <div class="lb-header">
+            <h2 class="lb-title">leaderboard</h2>
+            <div class="period-toggle">
+                <button class="period-btn active" data-period="daily">day</button>
+                <button class="period-btn" data-period="weekly">week</button>
+                <button class="period-btn" data-period="monthly">month</button>
+                <button class="period-btn" data-period="alltime">all</button>
+            </div>
+        </div>
+        <div class="lb-list" id="lbList"></div>
+    </section>
+
+    <section id="friends">
+        <div class="fr-header">
+            <h2 class="fr-title">friends</h2>
+            <button class="add-btn" onclick="openInvite()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
+                add
+            </button>
+        </div>
+        <div class="fr-grid" id="frGrid"></div>
+    </section>
+</div>
+
+<!-- Day Modal -->
+<div class="modal-bg" id="dayModal">
+    <div class="modal">
+        <div class="modal-head">
+            <h3 class="modal-title" id="dayModalTitle"></h3>
+            <button class="modal-close" onclick="closeModal('dayModal')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="session-list" id="sessionList"></div>
+    </div>
+</div>
+
+<!-- Add Friend Modal -->
+<div class="modal-bg" id="inviteModal">
+    <div class="modal">
+        <div class="modal-head">
+            <h3 class="modal-title">add a friend</h3>
+            <button class="modal-close" onclick="closeModal('inviteModal')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <div class="share-section">
+            <div class="share-label">share your code</div>
+            <span class="share-code" id="myInviteCode">loading...</span>
+            <button class="share-copy-btn" onclick="copyMyInviteCode()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                copy code
+            </button>
+        </div>
+
+        <div class="divider">or enter theirs</div>
+
+        <div class="friend-input-section">
+            <div class="friend-input-label">paste friend's invite code</div>
+            <div class="friend-input-row">
+                <input type="text" placeholder="DRIFT-XXXXXXXX" id="friendCode">
+                <button class="friend-add-btn" onclick="addFriend()">add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-bg" id="settingsModal">
+    <div class="modal" style="max-width: 420px;">
+        <div class="modal-head">
+            <h3 class="modal-title">settings</h3>
+            <button class="modal-close" onclick="closeModal('settingsModal')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="settings-section">
+            <div class="settings-section-title">profile</div>
+            <div class="settings-row" style="cursor: pointer;" onclick="document.getElementById('avatarInputSettings').click()">
+                <div class="settings-row-label">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+                    <span>change avatar</span>
+                </div>
+                <span class="settings-row-action">upload</span>
+                <input type="file" id="avatarInputSettings" accept="image/*" style="display: none;" onchange="uploadAvatarFromSettings(event)">
+            </div>
+        </div>
+
+        <!-- Background Section -->
+        <div class="settings-section">
+            <div class="settings-section-title">background</div>
+            <div class="bg-options">
+                <label class="bg-option" id="bgImageOption">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                    <span>upload image</span>
+                    <input type="file" accept="image/*" id="bgImageInput" onchange="handleBgUpload(event, 'image')">
+                </label>
+                <label class="bg-option" id="bgVideoOption">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>
+                    <span>upload video</span>
+                    <input type="file" accept="video/*" id="bgVideoInput" onchange="handleBgUpload(event, 'video')">
+                </label>
+            </div>
+
+            <div class="bg-slider-group">
+                <div class="bg-slider-label">
+                    <span>blur</span>
+                    <span id="blurValue">8px</span>
+                </div>
+                <input type="range" class="bg-slider" id="bgBlurSlider" min="0" max="30" value="8" oninput="updateBgBlur(this.value)">
+            </div>
+
+            <div class="bg-slider-group">
+                <div class="bg-slider-label">
+                    <span>overlay</span>
+                    <span id="overlayValue">70%</span>
+                </div>
+                <input type="range" class="bg-slider" id="bgOverlaySlider" min="0" max="100" value="70" oninput="updateBgOverlay(this.value)">
+            </div>
+
+            <button class="bg-clear-btn" onclick="clearBackground()">remove background</button>
+        </div>
+    </div>
+</div>
+
+<!-- My Invites Modal -->
+<div class="modal-bg" id="invitesModal">
+    <div class="modal">
+        <div class="modal-head">
+            <h3 class="modal-title">my invites</h3>
+            <button class="modal-close" onclick="closeModal('invitesModal')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="session-list" id="invitesList"></div>
+        <div class="input-row" style="margin-top: 16px;">
+            <button class="copy-btn" style="width: 100%;" onclick="generateInvite()">generate new invite</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // State
+    let running = false, paused = false, secs = 0, interval = null;
+    let label = 'focus', labelColor = 'var(--text-soft)';
+    let viewMonth = new Date().getMonth(), viewYear = new Date().getFullYear();
+    let currentUser = null;
+    let sessionData = {};
+    let myInviteCode = null;
+
+    const months = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+    const days = ['sun','mon','tue','wed','thu','fri','sat'];
+
+    // Init - fetch current user and sessions from server
+    async function init() {
+      try {
+        const res = await fetch('/api/me');
+        if (!res.ok) throw new Error();
+        currentUser = await res.json();
+
+        const btn = document.getElementById('userBtn');
+        if (currentUser.avatar) {
+          btn.innerHTML = `<img src="/uploads/${currentUser.avatar}" alt="${currentUser.username}">`;
+        } else {
+          btn.textContent = currentUser.username[0].toUpperCase();
+        }
+
+        await loadSessions();
+        await loadMyInviteCode();
+        loadBackgroundSettings();
+        updateStats();
+        startAutoSave();
+      } catch (e) {
+        window.location.href = '/';
+      }
+    }
+
+    async function loadMyInviteCode() {
+      try {
+        const res = await fetch('/api/my-invites');
+        const invites = await res.json();
+        const unused = invites.find(i => !i.used_by);
+        if (unused) {
+          myInviteCode = unused.code;
+        } else if (invites.length > 0) {
+          myInviteCode = invites[0].code;
+        }
+      } catch (e) {
+        console.error('Failed to load invite code');
+      }
+    }
+
+    async function loadSessions() {
+      const res = await fetch('/api/sessions');
+      const sessions = await res.json();
+      sessionData = {};
+      sessions.forEach(s => {
+        if (!sessionData[s.date]) sessionData[s.date] = { sessions: [], total: 0 };
+        sessionData[s.date].sessions.push({
+          label: s.label,
+          color: s.color,
+          mins: s.minutes,
+          time: s.time
+        });
+        sessionData[s.date].total += s.minutes;
+      });
+    }
+
+    // Theme
+    const theme = localStorage.getItem('drift_theme') || 'light';
+    if (theme === 'dark') document.documentElement.dataset.theme = 'dark';
+
+    function toggleTheme() {
+      const isDark = document.documentElement.dataset.theme === 'dark';
+      document.documentElement.dataset.theme = isDark ? '' : 'dark';
+      localStorage.setItem('drift_theme', isDark ? 'light' : 'dark');
+    }
+
+    // User Menu
+    function toggleUserMenu() {
+      document.getElementById('userDropdown').classList.toggle('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-menu')) {
+        document.getElementById('userDropdown').classList.remove('open');
+      }
+      if (!e.target.closest('.label-picker')) {
+        document.getElementById('labelMenu').classList.remove('open');
+      }
+    });
+
+    async function logout() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/';
+    }
+
+    function openSettings() {
+      document.getElementById('settingsModal').classList.add('open');
+      document.getElementById('userDropdown').classList.remove('open');
+    }
+
+    async function uploadAvatarFromSettings(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      try {
+        const res = await fetch('/api/upload-avatar', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.avatar) {
+          document.getElementById('userBtn').innerHTML = `<img src="/uploads/${data.avatar}" alt="avatar">`;
+          toast('avatar updated ✓');
+        } else {
+          toast(data.error || 'upload failed');
+        }
+      } catch (e) {
+        toast('upload failed');
+      }
+    }
+
+    async function openMyInvites() {
+      document.getElementById('invitesModal').classList.add('open');
+      document.getElementById('userDropdown').classList.remove('open');
+      const res = await fetch('/api/my-invites');
+      const invites = await res.json();
+      document.getElementById('invitesList').innerHTML = invites.map(i => `
+        <div class="session-row">
+          <div class="session-label">${i.code}</div>
+          <span class="session-time">${i.used_by ? 'used' : 'available'}</span>
+        </div>
+      `).join('') || '<div class="empty-msg">no invites yet</div>';
+    }
+
+    async function generateInvite() {
+      const res = await fetch('/api/generate-invite', { method: 'POST' });
+      const data = await res.json();
+      if (data.code) {
+        myInviteCode = data.code;
+        await navigator.clipboard.writeText(data.code);
+        toast(`${data.code} copied ✓`);
+        openMyInvites();
+      } else {
+        toast('failed to generate code');
+      }
+    }
+
+    // Navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.onclick = () => {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+        link.classList.add('active');
+        document.getElementById(link.dataset.page).classList.add('active');
+
+        if (link.dataset.page === 'calendar') renderCal();
+        if (link.dataset.page === 'leaderboard') renderLb('daily');
+        if (link.dataset.page === 'friends') renderFriends();
+      };
+    });
+
+    // Label picker
+    const picker = document.getElementById('labelPicker');
+    const menu = document.getElementById('labelMenu');
+    picker.onclick = e => {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    };
+
+    document.querySelectorAll('.label-opt').forEach(opt => {
+      opt.onclick = () => {
+        label = opt.dataset.label;
+        labelColor = opt.dataset.color;
+        document.getElementById('labelText').textContent = label;
+        picker.querySelector('.label-dot').style.background = labelColor;
+        picker.classList.toggle('has-label', label !== 'focus');
+        menu.classList.remove('open');
+      };
+    });
+
+    // Timer
+    const display = document.getElementById('timeDisplay');
+    const startBtn = document.getElementById('startBtn');
+    const endBtn = document.getElementById('endBtn');
+
+    function fmt(s) {
+      const m = Math.floor(s / 60), sec = s % 60;
+      return `${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+    }
+
+    function fmtMin(m) {
+      if (m === 0) return '0m';
+      if (m >= 60) {
+        const h = Math.floor(m / 60);
+        const min = m % 60;
+        return min > 0 ? `${h}h ${min}m` : `${h}h`;
+      }
+      return `${m}m`;
+    }
+
+    startBtn.onclick = () => {
+      if (!running) {
+        running = true;
+        paused = false;
+        startBtn.textContent = 'pause';
+        endBtn.style.display = 'inline-block';
+        display.classList.add('running');
+        interval = setInterval(() => {
+          secs++;
+          display.textContent = fmt(secs);
+        }, 1000);
+      } else if (!paused) {
+        paused = true;
+        startBtn.textContent = 'resume';
+        display.classList.remove('running');
+        clearInterval(interval);
+      } else {
+        paused = false;
+        startBtn.textContent = 'pause';
+        display.classList.add('running');
+        interval = setInterval(() => {
+          secs++;
+          display.textContent = fmt(secs);
+        }, 1000);
+      }
+    };
+
+    endBtn.onclick = async () => {
+      if (secs < 60) {
+        toast('session must be at least 1 minute');
+        return;
+      }
+
+      clearInterval(interval);
+      const today = new Date().toISOString().slice(0,10);
+      const mins = Math.floor(secs / 60);
+      const time = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+      try {
+        await fetch('/api/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label, color: labelColor, minutes: mins, date: today, time })
+        });
+
+        if (!sessionData[today]) sessionData[today] = { sessions: [], total: 0 };
+        sessionData[today].sessions.push({ label, color: labelColor, mins, time });
+        sessionData[today].total += mins;
+
+        running = false;
+        paused = false;
+        secs = 0;
+        display.textContent = '00:00';
+        display.classList.remove('running');
+        startBtn.textContent = 'start';
+        endBtn.style.display = 'none';
+
+        updateStats();
+        toast(`${fmtMin(mins)} session saved ✓`);
+      } catch (e) {
+        toast('failed to save session');
+      }
+    };
+
+    function updateStats() {
+      const today = new Date().toISOString().slice(0,10);
+      const todayData = sessionData[today] || { total: 0, sessions: [] };
+      document.getElementById('todayTime').textContent = fmtMin(todayData.total);
+      document.getElementById('sessionCount').textContent = todayData.sessions.length;
+
+      let weekTotal = 0;
+      const now = new Date();
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0,10);
+        weekTotal += sessionData[key]?.total || 0;
+      }
+      document.getElementById('weekTime').textContent = fmtMin(weekTotal);
+
+      let streak = 0;
+      let checkDate = new Date();
+      while (streak < 365) {
+        const key = checkDate.toISOString().slice(0,10);
+        if (!sessionData[key] || sessionData[key].total === 0) break;
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      }
+      document.getElementById('streakNum').textContent = streak;
+    }
+
+    // Calendar
+    function renderCal() {
+      document.getElementById('calTitle').textContent = `${months[viewMonth]} ${viewYear}`;
+      const first = new Date(viewYear, viewMonth, 1).getDay();
+      const daysIn = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const today = new Date();
+
+      let html = days.map(d => `<div class="cal-weekday">${d}</div>`).join('');
+      for (let i = 0; i < first; i++) html += '<div class="cal-day empty"></div>';
+
+      for (let d = 1; d <= daysIn; d++) {
+        const key = `${viewYear}-${(viewMonth+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+        const mins = sessionData[key]?.total || 0;
+        let lvl = '';
+        if (mins > 0) lvl = 'l1';
+        if (mins >= 30) lvl = 'l2';
+        if (mins >= 60) lvl = 'l3';
+        if (mins >= 120) lvl = 'l4';
+        if (mins >= 180) lvl = 'l5';
+
+        const isToday = d === today.getDate() &&
+                        viewMonth === today.getMonth() &&
+                        viewYear === today.getFullYear();
+
+        html += `<div class="cal-day ${lvl} ${isToday ? 'today' : ''}" onclick="openDay('${key}')">
+          <span class="num">${d}</span>
+          ${mins ? `<span class="mins">${fmtMin(mins)}</span>` : ''}
+        </div>`;
+      }
+      document.getElementById('calGrid').innerHTML = html;
+    }
+
+    function changeMonth(dir) {
+      viewMonth += dir;
+      if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      renderCal();
+    }
+
+    function openDay(key) {
+      const d = new Date(key + 'T12:00:00');
+      document.getElementById('dayModalTitle').textContent =
+        d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+      const sessions = sessionData[key]?.sessions || [];
+      document.getElementById('sessionList').innerHTML = sessions.length ? sessions.map(s => `
+        <div class="session-row">
+          <div class="session-label">
+            <span class="label-dot" style="background:${s.color}"></span>
+            ${s.label}
+          </div>
+          <span class="session-time">${fmtMin(s.mins)}</span>
+        </div>
+      `).join('') : '<div class="empty-msg">no sessions this day</div>';
+      document.getElementById('dayModal').classList.add('open');
+    }
+
+    // Leaderboard - fetches from /api/leaderboard/:period
+    async function renderLb(period) {
+      const res = await fetch(`/api/leaderboard/${period}`);
+      const leaderboard = await res.json();
+      document.getElementById('lbList').innerHTML = leaderboard.map((u, i) => `
+        <div class="lb-item ${u.isYou ? 'you' : ''}">
+          <span class="lb-rank">${i + 1}</span>
+          <div class="lb-avatar">${u.avatar ?
+            `<img src="/uploads/${u.avatar}" alt="${u.username}">` :
+            u.username[0].toUpperCase()}</div>
+          <div class="lb-info">
+            <div class="lb-name">${u.username}${u.isYou ? ' (you)' : ''}</div>
+            <div class="lb-streak">${u.streak} day streak</div>
+          </div>
+          <span class="lb-time">${fmtMin(u.minutes)}</span>
+        </div>
+      `).join('') || '<div class="empty-msg">no data yet</div>';
+    }
+
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderLb(btn.dataset.period);
+      };
+    });
+
+    // Friends - fetches from /api/friends and /api/friend-stats/:friendId
+    async function renderFriends() {
+      const res = await fetch('/api/friends');
+      const friends = await res.json();
+
+      const friendsWithStats = await Promise.all(friends.map(async f => {
+        const sessRes = await fetch(`/api/friend-stats/${f.id}`);
+        const stats = await sessRes.json();
+        return { ...f, ...stats };
+      }));
+
+      document.getElementById('frGrid').innerHTML = friendsWithStats.length ?
+        friendsWithStats.map(f => `
+        <div class="fr-card">
+          <div class="fr-avatar">${f.avatar ?
+            `<img src="/uploads/${f.avatar}" alt="${f.username}">` :
+            f.username[0].toUpperCase()}</div>
+          <div class="fr-name">${f.username}</div>
+          <div class="fr-status ${f.todayMinutes > 0 ? 'active' : ''}">${f.todayMinutes > 0 ? 'active today' : 'offline'}</div>
+          <div class="fr-stats">
+            <div>
+              <div class="fr-stat-val">${fmtMin(f.todayMinutes || 0)}</div>
+              <div class="fr-stat-lbl">today</div>
+            </div>
+            <div>
+              <div class="fr-stat-val">${f.streak || 0}</div>
+              <div class="fr-stat-lbl">streak</div>
+            </div>
+          </div>
+        </div>
+      `).join('') :
+      '<div class="empty-msg">add friends to see their progress</div>';
+    }
+
+    async function openInvite() {
+      document.getElementById('inviteModal').classList.add('open');
+
+      // Load or generate invite code
+      if (!myInviteCode) {
+        document.getElementById('myInviteCode').textContent = 'generating...';
+        try {
+          const res = await fetch('/api/generate-invite', { method: 'POST' });
+          const data = await res.json();
+          if (data.code) {
+            myInviteCode = data.code;
+          }
+        } catch (e) {
+          console.error('Failed to generate invite');
+        }
+      }
+      document.getElementById('myInviteCode').textContent = myInviteCode || 'no code';
+    }
+
+    async function copyMyInviteCode() {
+      if (myInviteCode) {
+        await navigator.clipboard.writeText(myInviteCode);
+        toast('code copied ✓');
+      } else {
+        toast('no code available');
+      }
+    }
+
+    // Background settings
+
+    function handleBgUpload(event, type) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const bgMedia = document.getElementById('bgMedia');
+
+        if (type === 'image') {
+          bgMedia.innerHTML = `<img src="${e.target.result}" alt="background">`;
+          document.getElementById('bgImageOption').classList.add('active');
+          document.getElementById('bgVideoOption').classList.remove('active');
+        } else {
+          bgMedia.innerHTML = `<video src="${e.target.result}" autoplay loop muted playsinline></video>`;
+          document.getElementById('bgVideoOption').classList.add('active');
+          document.getElementById('bgImageOption').classList.remove('active');
+        }
+
+        // Save to localStorage
+        localStorage.setItem('drift_bg', JSON.stringify({
+          type,
+          data: e.target.result
+        }));
+
+        toast('background updated ✓');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateBgBlur(value) {
+      document.documentElement.style.setProperty('--bg-blur', value + 'px');
+      document.getElementById('blurValue').textContent = value + 'px';
+      localStorage.setItem('drift_bg_blur', value);
+    }
+
+    function updateBgOverlay(value) {
+      document.documentElement.style.setProperty('--bg-overlay', value / 100);
+      document.getElementById('overlayValue').textContent = value + '%';
+      localStorage.setItem('drift_bg_overlay', value);
+    }
+
+    function clearBackground() {
+      document.getElementById('bgMedia').innerHTML = '';
+      document.getElementById('bgImageOption').classList.remove('active');
+      document.getElementById('bgVideoOption').classList.remove('active');
+      localStorage.removeItem('drift_bg');
+      toast('background removed');
+    }
+
+    function loadBackgroundSettings() {
+      // Load blur
+      const blur = localStorage.getItem('drift_bg_blur') || '8';
+      document.documentElement.style.setProperty('--bg-blur', blur + 'px');
+      document.getElementById('bgBlurSlider').value = blur;
+      document.getElementById('blurValue').textContent = blur + 'px';
+
+      // Load overlay
+      const overlay = localStorage.getItem('drift_bg_overlay') || '70';
+      document.documentElement.style.setProperty('--bg-overlay', overlay / 100);
+      document.getElementById('bgOverlaySlider').value = overlay;
+      document.getElementById('overlayValue').textContent = overlay + '%';
+
+      // Load background media
+      const bgData = localStorage.getItem('drift_bg');
+      if (bgData) {
+        try {
+          const bg = JSON.parse(bgData);
+          const bgMedia = document.getElementById('bgMedia');
+          if (bg.type === 'image') {
+            bgMedia.innerHTML = `<img src="${bg.data}" alt="background">`;
+            document.getElementById('bgImageOption').classList.add('active');
+          } else {
+            bgMedia.innerHTML = `<video src="${bg.data}" autoplay loop muted playsinline></video>`;
+            document.getElementById('bgVideoOption').classList.add('active');
+          }
+        } catch (e) {}
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    async function addFriend() {
+      const code = document.getElementById('friendCode').value.trim();
+      if (!code) return toast('enter a code');
+
+      try {
+        const res = await fetch('/api/add-friend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          toast('friend added ✓');
+          document.getElementById('friendCode').value = '';
+          closeModal('inviteModal');
+        } else {
+          toast(data.error || 'failed to add friend');
+        }
+      } catch (e) {
+        toast('failed to add friend');
+      }
+    }
+
+    document.querySelectorAll('.modal-bg').forEach(m => {
+      m.onclick = e => {
+        if (e.target === m) m.classList.remove('open');
+      };
+    });
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // Auto-save running session to localStorage
+    function startAutoSave() {
+      setInterval(() => {
+        if (running && secs > 0) {
+          localStorage.setItem('drift_session', JSON.stringify({
+            secs,
+            label,
+            labelColor,
+            startTime: Date.now() - (secs * 1000)
+          }));
+        } else {
+          localStorage.removeItem('drift_session');
+        }
+      }, 5000);
+    }
+
+    // Restore session if page was refreshed
+    const saved = localStorage.getItem('drift_session');
+    if (saved) {
+      try {
+        const session = JSON.parse(saved);
+        const elapsed = Math.floor((Date.now() - session.startTime) / 1000);
+        if (elapsed < 3600 && elapsed > session.secs) {
+          secs = elapsed;
+          label = session.label;
+          labelColor = session.labelColor;
+          display.textContent = fmt(secs);
+          document.getElementById('labelText').textContent = label;
+          picker.querySelector('.label-dot').style.background = labelColor;
+          picker.classList.toggle('has-label', label !== 'focus');
+        }
+      } catch (e) {}
+    }
+
+    // Warn before leaving with active session
+    window.addEventListener('beforeunload', (e) => {
+      if (running && secs > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    // Spacebar to start/pause
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+        startBtn.click();
+      }
+    });
+
+    // Start app
+    init();
+</script>
+</body>
+</html>

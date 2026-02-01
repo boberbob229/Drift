@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>drift — study together</title>
+    <meta name="description" content="Study together with friends. Track your focus sessions, compete on leaderboards, and stay motivated.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+          --bg: #0a0a09;
+          --bg-elevated: #141312;
+          --bg-subtle: #1c1b19;
+          --text: #f5f3ef;
+          --text-soft: #b5b0a6;
+          --text-muted: #6b665c;
+          --border: #2e2c28;
+          --accent: #d4b896;
+          --accent-soft: #2a2520;
+          --success: #8fb08a;
+          --error: #d17a7a;
+        }
+
+        [data-theme="light"] {
+          --bg: #faf9f7;
+          --bg-elevated: #ffffff;
+          --bg-subtle: #f3f1ed;
+          --text: #1d1c1a;
+          --text-soft: #6b6760;
+          --text-muted: #a09a90;
+          --border: #e8e5de;
+          --accent: #c4a574;
+          --accent-soft: #f5efe6;
+          --success: #7a9b76;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+          height: 100%;
+          font-family: 'DM Sans', system-ui, sans-serif;
+          background: var(--bg);
+          color: var(--text);
+          -webkit-font-smoothing: antialiased;
+          transition: background 0.4s ease, color 0.3s ease;
+        }
+
+        body {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+        }
+
+        .theme-toggle {
+          position: fixed;
+          top: 24px;
+          right: 24px;
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          border: 1px solid var(--border);
+          background: var(--bg-elevated);
+          display: grid;
+          place-items: center;
+          cursor: pointer;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+          transition: all 0.25s ease;
+          z-index: 10;
+        }
+
+        .theme-toggle:hover {
+          background: var(--bg-subtle);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        .theme-toggle svg {
+          width: 20px;
+          height: 20px;
+          stroke: var(--text-soft);
+          stroke-width: 1.5;
+          fill: none;
+          transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover svg { stroke: var(--text); }
+
+        .icon-sun, .icon-moon { position: absolute; transition: all 0.4s cubic-bezier(.4,0,.2,1); }
+        .icon-sun { opacity: 0; transform: scale(0.5) rotate(-60deg); }
+        .icon-moon { opacity: 1; transform: scale(1) rotate(0deg); }
+        [data-theme="light"] .icon-sun { opacity: 1; transform: scale(1) rotate(0deg); }
+        [data-theme="light"] .icon-moon { opacity: 0; transform: scale(0.5) rotate(60deg); }
+
+        .auth-container {
+          width: 100%;
+          max-width: 440px;
+          animation: fadeUp 0.6s ease-out;
+        }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-box {
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 24px;
+          padding: 48px 40px;
+          box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+          transition: background 0.4s ease, border 0.3s ease;
+        }
+
+        .brand {
+          font-family: 'Fraunces', serif;
+          font-size: 42px;
+          font-weight: 400;
+          text-align: center;
+          letter-spacing: -0.03em;
+          margin-bottom: 8px;
+          background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .tagline {
+          text-align: center;
+          font-size: 14px;
+          color: var(--text-muted);
+          margin-bottom: 40px;
+          letter-spacing: 0.02em;
+        }
+
+        .auth-form {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .auth-form input {
+          padding: 16px 20px;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          font-family: inherit;
+          font-size: 15px;
+          color: var(--text);
+          transition: all 0.2s ease;
+        }
+
+        .auth-form input:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .auth-form input::placeholder { color: var(--text-muted); }
+
+        .auth-form button {
+          font-family: inherit;
+          font-size: 15px;
+          font-weight: 500;
+          padding: 16px 40px;
+          border-radius: 100px;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          border: none;
+          background: linear-gradient(135deg, var(--text) 0%, color-mix(in srgb, var(--text) 85%, var(--accent)) 100%);
+          color: var(--bg);
+          margin-top: 12px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .auth-form button::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .auth-form button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .auth-form button:hover::before { opacity: 1; }
+        .auth-form button:active { transform: translateY(0) scale(0.98); }
+
+        .switch {
+          text-align: center;
+          font-size: 13px;
+          color: var(--text-soft);
+          margin-top: 28px;
+        }
+
+        .switch a {
+          color: var(--accent);
+          text-decoration: none;
+          font-weight: 500;
+          transition: opacity 0.2s ease;
+        }
+
+        .switch a:hover { opacity: 0.8; }
+
+        .error {
+          min-height: 20px;
+          text-align: center;
+          font-size: 13px;
+          margin-top: 20px;
+          transition: color 0.3s ease;
+        }
+
+        .error.visible { color: var(--error); }
+        .error.success { color: var(--success); }
+
+        .decorative {
+          position: fixed;
+          pointer-events: none;
+          opacity: 0.03;
+        }
+
+        .decorative-1 {
+          top: -20%;
+          right: -10%;
+          width: 600px;
+          height: 600px;
+          background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+          border-radius: 50%;
+          filter: blur(100px);
+        }
+
+        .decorative-2 {
+          bottom: -20%;
+          left: -10%;
+          width: 500px;
+          height: 500px;
+          background: radial-gradient(circle, var(--success) 0%, transparent 70%);
+          border-radius: 50%;
+          filter: blur(80px);
+        }
+
+        @media (max-width: 480px) {
+          .auth-box { padding: 36px 28px; border-radius: 20px; }
+          .brand { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+<div class="decorative decorative-1"></div>
+<div class="decorative decorative-2"></div>
+
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <svg class="icon-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M2 12h2m16 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+</button>
+
+<div class="auth-container">
+    <div class="auth-box">
+        <h1 class="brand">drift</h1>
+        <p class="tagline">study together</p>
+
+        <form id="loginForm" class="auth-form">
+            <input type="text" id="loginUser" placeholder="username" autocomplete="username" required>
+            <input type="password" id="loginPass" placeholder="password" autocomplete="current-password" required>
+            <button type="submit">sign in</button>
+            <p class="switch">don't have an account? <a href="#" onclick="showRegister();return false;">register</a></p>
+        </form>
+
+        <form id="registerForm" class="auth-form" style="display:none">
+            <input type="text" id="regUser" placeholder="username" autocomplete="username" required>
+            <input type="password" id="regPass" placeholder="password" autocomplete="new-password" required>
+            <input type="text" id="regCode" placeholder="invite code" required>
+            <button type="submit">create account</button>
+            <p class="switch">already have an account? <a href="#" onclick="showLogin();return false;">sign in</a></p>
+        </form>
+
+        <div id="error" class="error"></div>
+    </div>
+</div>
+
+<script>
+    const root = document.documentElement;
+    const errorEl = document.getElementById('error');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+
+    const savedTheme = localStorage.getItem('drift_theme') || 'dark';
+    root.dataset.theme = savedTheme;
+
+    function toggleTheme() {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      localStorage.setItem('drift_theme', next);
+    }
+
+    function showError(msg, isSuccess = false) {
+      errorEl.textContent = msg;
+      errorEl.className = 'error visible' + (isSuccess ? ' success' : '');
+    }
+
+    function clearError() {
+      errorEl.textContent = '';
+      errorEl.className = 'error';
+    }
+
+    function showRegister() {
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'flex';
+      clearError();
+    }
+
+    function showLogin() {
+      registerForm.style.display = 'none';
+      loginForm.style.display = 'flex';
+      clearError();
+    }
+
+    loginForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('loginUser').value.trim();
+      const password = document.getElementById('loginPass').value;
+
+      if (!username || !password) {
+        showError('please enter username and password');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          window.location.href = 'app.html';
+        } else {
+          showError(data.error || 'login failed');
+        }
+      } catch {
+        showError('connection error');
+      }
+    };
+
+    registerForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('regUser').value.trim();
+      const password = document.getElementById('regPass').value;
+      const inviteCode = document.getElementById('regCode').value.trim();
+
+      if (!username || !password || !inviteCode) {
+        showError('please fill in all fields');
+        return;
+      }
+      if (username.length < 3) {
+        showError('username must be at least 3 characters');
+        return;
+      }
+      if (password.length < 8) {
+        showError('password must be at least 8 characters');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, inviteCode })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showError('account created!', true);
+          setTimeout(() => {
+            document.getElementById('loginUser').value = username;
+            document.getElementById('loginPass').value = password;
+            showLogin();
+            loginForm.dispatchEvent(new Event('submit'));
+          }, 800);
+        } else {
+          showError(data.error || 'registration failed');
+        }
+      } catch {
+        showError('connection error');
+      }
+    };
+</script>
+</body>
+</html>
