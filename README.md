@@ -4,18 +4,7 @@ A quiet, invite-only study app designed for sustained focus and intentional lear
 
 Drift removes noise instead of adding features. Nothing competes for your attention. Everything exists for a reason.
 
-## Philosophy
 
-Most study tools try to motivate you through gamification—points, streaks, leaderboards, notifications. Drift takes the opposite approach.
-
-It creates a space that fades into the background so you can stay present with what you're working on. The interface is minimal, the structure is flexible, and the experience is deliberately slow.
-
-**Drift is opinionated:**
-- Calm over stimulation
-- Clarity over customization  
-- Focus over engagement
-
-If something doesn't directly support studying, it doesn't belong here.
 
 ## Features
 
