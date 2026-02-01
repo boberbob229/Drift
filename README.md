@@ -1,71 +1,51 @@
-Drift
+# Drift
 
-Drift is a quiet, invite-only study app designed for sustained focus and intentional learning.
+A quiet, invite-only study app designed for sustained focus and intentional learning.
 
-It removes noise instead of adding features.
-Nothing competes for your attention. Everything exists for a reason.
+Drift removes noise instead of adding features. Nothing competes for your attention. Everything exists for a reason.
 
-Overview
+## Philosophy
 
-Most study tools try to motivate you with numbers, streaks, and pressure.
-Drift does the opposite.
+Most study tools try to motivate you through gamification—points, streaks, leaderboards, notifications. Drift takes the opposite approach.
 
-It creates a space that fades into the background so you can stay present with what you’re working on.
+It creates a space that fades into the background so you can stay present with what you're working on. The interface is minimal, the structure is flexible, and the experience is deliberately slow.
 
-The interface is minimal, the structure is flexible, and the experience is deliberately slow.
+**Drift is opinionated:**
+- Calm over stimulation
+- Clarity over customization  
+- Focus over engagement
 
-Features
+If something doesn't directly support studying, it doesn't belong here.
 
-Invite-only accounts to keep the platform focused and intentional
+## Features
 
-Clean, distraction-free interface with generous spacing
+- **Invite-only accounts** – Keeps the platform focused and intentional
+- **Distraction-free interface** – Clean layout with generous spacing
+- **Notion-inspired design** – Familiar visual hierarchy that feels natural
+- **Focus timer** – Built for long, uninterrupted sessions
+- **Lightweight social elements** – Connection without feeds or noise
 
-Notion-inspired layout and visual hierarchy
+## Tech Stack
 
-Simple focus timer built for long sessions
+- Node.js (v20+)
+- Modern JavaScript tooling
+- Minimal backend architecture focused on performance and simplicity
 
-Lightweight social elements without feeds or noise
+## Getting Started
 
-Design Philosophy
-
-Drift is opinionated.
-
-Calm over stimulation
-
-Clarity over customization
-
-Focus over engagement
-
-If something doesn’t directly support studying, it doesn’t belong here.
-
-Screenshots
-<img src="./screenshots/timer-dark.png" alt="Drift focus timer dark mode" width="100%" /> <img src="./screenshots/timer-light.png" alt="Drift focus timer light mode" width="100%" />
-
-The interface is designed to stay visually quiet while still feeling deliberate and refined.
-
-Tech Stack
-
-Node.js (v20+)
-
-Modern JavaScript tooling
-
-Minimal backend architecture focused on performance and simplicity
-
-Getting Started
+```bash
 npm install
-npm run 
+npm run
+```
 
+Make sure you're running Node 20.x or higher.
 
-Make sure you’re running a recent Node 20.x version.
-
-Access Model
+## Access Model
 
 Drift does not have public signups.
 
-Accounts are created through invites only.
-This is intentional and unlikely to change.
+Accounts are created through invites only. This is intentional and unlikely to change.
 
-License
+## License
 
-This project is licensed under the WTFPL.
-Do whatever you want.
+This project is licensed under the [WTFPL](http://www.wtfpl.net/). Do whatever you want.
